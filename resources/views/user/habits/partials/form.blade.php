@@ -10,6 +10,15 @@
 </div>
 
 <div class="mb-3">
+    <label class="form-label" for="type">Privacy Type</label>
+    <select id="type" name="type" class="form-select @error('type') is-invalid @enderror" required>
+        <option value="private" @selected(old('type', $habit->type ?? 'private') === 'private')>Private (Only you see details; admin only sees name)</option>
+        <option value="public" @selected(old('type', $habit->type ?? 'public') === 'public')>Public (Users can join; admin can see details/progress/posts)</option>
+    </select>
+    @error('type')<div class="invalid-feedback">{{ $message }}</div>@enderror
+</div>
+
+<div class="mb-3">
     <label class="form-label" for="category">Category</label>
     <input id="category" name="category" type="text" class="form-control @error('category') is-invalid @enderror"
            value="{{ old('category', $habit->category ?? '') }}" maxlength="100" placeholder="Health, Study, Wellness…">

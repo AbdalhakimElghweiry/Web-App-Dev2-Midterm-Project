@@ -6,11 +6,19 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
         <div>
             <h1 class="h3 mb-0">Welcome back, {{ auth()->user()->name }}</h1>
-            <p class="text-muted mb-0">Track today’s habits and watch your streaks grow.</p>
+            <p class="text-muted mb-0">
+                Track today’s habits and watch your streaks grow.
+                <span class="badge bg-warning text-dark ms-2"><i class="bi bi-coin me-1"></i>{{ auth()->user()->credits }} credits</span>
+            </p>
         </div>
-        <a href="{{ route('user.habits.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg me-1"></i>New habit
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('user.habits.explore') }}" class="btn btn-outline-primary">
+                <i class="bi bi-compass me-1"></i>Explore Challenges
+            </a>
+            <a href="{{ route('user.habits.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i>New habit
+            </a>
+        </div>
     </div>
 
     <div class="row g-3 mb-4">

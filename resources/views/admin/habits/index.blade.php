@@ -15,6 +15,7 @@
                 <tr>
                     <th>Habit</th>
                     <th>Owner</th>
+                    <th>Type</th>
                     <th>Category</th>
                     <th>Difficulty</th>
                     <th class="text-end">Actions</th>
@@ -22,12 +23,35 @@
                 </thead>
                 <tbody>
                 @foreach ($habits as $habit)
+                    @php
+                        $isPrivate = $habit->type === 'private';
+                    @endphp
                     <tr>
                         <td class="fw-semibold">{{ $habit->name }}</td>
                         <td>{{ $habit->user->name }}</td>
-                        <td>{{ $habit->category ?? '—' }}</td>
-                        <td><span class="badge bg-secondary text-capitalize">{{ $habit->difficulty }}</span></td>
+                        <td>
+                            <span class="badge {{ $habit->type === 'public' ? 'bg-info text-dark' : 'bg-dark text-white' }} text-capitalize">
+                                {{ $habit->type }}
+                            </span>
+                        </td>
+                        <td>
+                            @if ($isPrivate)
+                                <span class="text-muted font-monospace small">[Private]</span>
+                            @else
+                                {{ $habit->category ?? '—' }}
+                            @endif
+                        </td>
+                        <td>
+                            @if ($isPrivate)
+                                <span class="text-muted font-monospace small">[Private]</span>
+                            @else
+                                <span class="badge bg-secondary text-capitalize">{{ $habit->difficulty }}</span>
+                            @endif
+                        </td>
                         <td class="text-end">
+                            @if ($habit->type === 'public')
+                                <a class="btn btn-sm btn-outline-info me-1" href="{{ route('admin.habits.details', $habit) }}">Details</a>
+                            @endif
                             <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.habits.edit', $habit) }}">Edit</a>
                             <form class="d-inline" method="post" action="{{ route('admin.habits.destroy', $habit) }}" onsubmit="return confirm('Delete this habit?');">
                                 @csrf

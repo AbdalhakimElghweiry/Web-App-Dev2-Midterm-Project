@@ -20,7 +20,9 @@
                 <div class="card-body">
                     <div class="text-muted small text-uppercase">Habits</div>
                     <div class="display-6 fw-bold text-success">{{ $stats['habits'] }}</div>
-                    <div class="small text-muted">Across all users</div>
+                    <div class="small text-muted">
+                        {{ $stats['habits_public'] }} public challenges | {{ $stats['habits_private'] }} private
+                    </div>
                 </div>
             </div>
         </div>

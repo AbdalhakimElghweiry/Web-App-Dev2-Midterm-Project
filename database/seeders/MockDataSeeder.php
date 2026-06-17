@@ -58,30 +58,35 @@ class MockDataSeeder extends Seeder
         $this->seedHabitsForUser($demo, [
             [
                 'name' => 'Morning Gym Session',
+                'type' => 'public',
                 'category' => 'Fitness',
                 'difficulty' => 'medium',
                 'description' => '45 minutes of strength training or cardio before 9am.',
             ],
             [
                 'name' => 'Deep Study Block',
+                'type' => 'private',
                 'category' => 'Education',
                 'difficulty' => 'hard',
                 'description' => 'Two focused 25-minute Pomodoro sessions with a short break.',
             ],
             [
                 'name' => 'Drink 8 Glasses of Water',
+                'type' => 'public',
                 'category' => 'Wellness',
                 'difficulty' => 'easy',
                 'description' => 'Track hydration; one log counts when you finish the full goal.',
             ],
             [
                 'name' => 'Evening Reading',
+                'type' => 'private',
                 'category' => 'Personal growth',
                 'difficulty' => 'easy',
                 'description' => 'Read at least 15 pages of any book or long-form article.',
             ],
             [
                 'name' => 'Lights Out by 11pm',
+                'type' => 'private',
                 'category' => 'Sleep',
                 'difficulty' => 'medium',
                 'description' => 'Start wind-down routine by 10:30pm; lights off by 11.',
@@ -92,12 +97,14 @@ class MockDataSeeder extends Seeder
         $this->seedHabitsForUser($alex, [
             [
                 'name' => 'Walk 10k Steps',
+                'type' => 'public',
                 'category' => 'Health',
                 'difficulty' => 'easy',
                 'description' => 'Outdoor walk or treadmill; sync with phone if available.',
             ],
             [
                 'name' => 'Study Spanish Vocabulary',
+                'type' => 'private',
                 'category' => 'Study',
                 'difficulty' => 'medium',
                 'description' => 'Review 20 flashcards and complete one short listening exercise.',
@@ -108,12 +115,14 @@ class MockDataSeeder extends Seeder
         $this->seedHabitsForUser($jordan, [
             [
                 'name' => 'Track Water Intake',
+                'type' => 'public',
                 'category' => 'Hydration',
                 'difficulty' => 'easy',
                 'description' => 'Log each bottle; goal is 2 liters.',
             ],
             [
                 'name' => 'Library Study Hour',
+                'type' => 'private',
                 'category' => 'Academic',
                 'difficulty' => 'hard',
                 'description' => 'Quiet desk work on assignments or exam prep.',
@@ -124,6 +133,7 @@ class MockDataSeeder extends Seeder
         $this->seedHabitsForUser($admin, [
             [
                 'name' => 'Review team dashboards',
+                'type' => 'public',
                 'category' => 'Leadership',
                 'difficulty' => 'medium',
                 'description' => 'Skim analytics and note any anomalies for the weekly stand-up.',
@@ -154,7 +164,7 @@ class MockDataSeeder extends Seeder
     }
 
     /**
-     * @param  array<int, array{name: string, category: string|null, difficulty: string, description: string|null}>  $rows
+     * @param  array<int, array{name: string, type: string, category: string|null, difficulty: string, description: string|null}>  $rows
      */
     protected function seedHabitsForUser(User $user, array $rows): void
     {
@@ -165,6 +175,7 @@ class MockDataSeeder extends Seeder
                     'name' => $row['name'],
                 ],
                 [
+                    'type' => $row['type'] ?? 'private',
                     'category' => $row['category'],
                     'difficulty' => $row['difficulty'],
                     'description' => $row['description'],

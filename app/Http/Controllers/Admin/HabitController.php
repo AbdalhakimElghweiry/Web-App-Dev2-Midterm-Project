@@ -47,7 +47,17 @@ class HabitController extends Controller
 
     public function update(Request $request, Habit $habit): RedirectResponse
     {
-        $habit->update($this->validatedHabit($request));
+        if ($habit->type === 'private') {
+            $data = $request->validate([
+                'user_id' => ['required', 'exists:users,id'],
+                'name' => ['required', 'string', 'max:255'],
+                'type' => ['required', 'in:public,private'],
+            ]);
+        } else {
+            $data = $this->validatedHabit($request);
+        }
+
+        $habit->update($data);
 
         return redirect()->route('admin.habits.index')->with('success', 'Habit updated.');
     }
@@ -59,11 +69,78 @@ class HabitController extends Controller
         return redirect()->route('admin.habits.index')->with('success', 'Habit deleted.');
     }
 
+    public function showDetails(Habit $habit): View
+    {
+        abort_unless($habit->type === 'public', 403);
+        
+        $parent = $habit->parent_id ? $habit->parent : $habit;
+        
+        $participations = Habit::query()
+            ->where('parent_id', $parent->id)
+            ->orWhere('id', $parent->id)
+            ->with(['user', 'habitLogs'])
+            ->get();
+            
+        $leaderboard = $participations->map(function ($part) {
+            $completionsCount = $part->habitLogs()->where('is_completed', true)->count();
+            return [
+                'user' => $part->user,
+                'completions_count' => $completionsCount,
+            ];
+        })->sortByDesc('completions_count')->values();
+        
+        $posts = $parent->posts()->with('user')->orderByDesc('created_at')->get();
+        
+        return view('admin.habits.show', compact('parent', 'leaderboard', 'posts'));
+    }
+
+    public function awardCredits(Request $request, Habit $habit): RedirectResponse
+    {
+        abort_unless($habit->type === 'public', 403);
+        $parent = $habit->parent_id ? $habit->parent : $habit;
+        
+        $validated = $request->validate([
+            'amount' => ['required', 'integer', 'min:1', 'max:1000'],
+        ]);
+        $amount = $validated['amount'];
+        
+        $participations = Habit::query()
+            ->where('parent_id', $parent->id)
+            ->orWhere('id', $parent->id)
+            ->with(['user', 'habitLogs'])
+            ->get();
+            
+        $leaderboard = $participations->map(function ($part) {
+            $completionsCount = $part->habitLogs()->where('is_completed', true)->count();
+            return [
+                'user' => $part->user,
+                'completions_count' => $completionsCount,
+            ];
+        })->sortByDesc('completions_count')->values();
+        
+        // Take top 5 entries
+        $top5 = $leaderboard->take(5);
+        
+        $awardedUsers = [];
+        foreach ($top5 as $entry) {
+            $user = $entry['user'];
+            if ($user) {
+                $user->increment('credits', $amount);
+                $awardedUsers[] = $user->name;
+            }
+        }
+        
+        $names = count($awardedUsers) > 0 ? implode(', ', $awardedUsers) : 'None';
+        
+        return back()->with('success', "Awarded {$amount} credits to top participants: {$names}!");
+    }
+
     protected function validatedHabit(Request $request): array
     {
         return $request->validate([
             'user_id' => ['required', 'exists:users,id'],
             'name' => ['required', 'string', 'max:255'],
+            'type' => ['required', 'in:public,private'],
             'category' => ['nullable', 'string', 'max:100'],
             'difficulty' => ['required', 'in:easy,medium,hard'],
             'description' => ['nullable', 'string', 'max:2000'],

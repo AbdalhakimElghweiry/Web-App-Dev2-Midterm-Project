@@ -8,7 +8,10 @@
             <h1 class="h3 mb-0">My habits</h1>
             <p class="text-muted mb-0 small">Create, edit, or remove habits you want to track.</p>
         </div>
-        <a href="{{ route('user.habits.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Add habit</a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('user.habits.explore') }}" class="btn btn-outline-primary"><i class="bi bi-compass me-1"></i>Explore Challenges</a>
+            <a href="{{ route('user.habits.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Add habit</a>
+        </div>
     </div>
 
     <div class="row g-3">
@@ -17,18 +20,26 @@
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h2 class="h5 mb-0">{{ $habit->name }}</h2>
-                            <span class="badge bg-secondary text-capitalize">{{ $habit->difficulty }}</span>
+                            <h2 class="h5 mb-0 text-truncate" style="max-width: 65%;">{{ $habit->name }}</h2>
+                            <div>
+                                <span class="badge bg-secondary text-capitalize">{{ $habit->difficulty }}</span>
+                                <span class="badge {{ $habit->type === 'public' ? 'bg-info text-dark' : 'bg-dark text-white' }} text-capitalize">{{ $habit->type }}</span>
+                            </div>
                         </div>
                         <p class="text-muted small mb-2">
-                            <i class="bi bi-tag"></i> {{ $habit->category ?? 'General' }}
+                            <i class="bi bi-tag text-primary"></i> {{ $habit->category ?? 'General' }}
                         </p>
                         @if ($habit->description)
                             <p class="small text-muted flex-grow-1">{{ \Illuminate\Support\Str::limit($habit->description, 120) }}</p>
                         @endif
-                        <div class="d-flex gap-2 mt-3">
+                        <div class="d-flex gap-2 mt-3 align-items-center">
                             <a class="btn btn-sm btn-outline-primary" href="{{ route('user.habits.edit', $habit) }}">Edit</a>
-                            <form action="{{ route('user.habits.destroy', $habit) }}" method="post" onsubmit="return confirm('Delete this habit?');">
+                            @if ($habit->type === 'public')
+                                <a class="btn btn-sm btn-outline-info" href="{{ route('user.habits.community', $habit) }}">
+                                    <i class="bi bi-people-fill me-1"></i>Community
+                                </a>
+                            @endif
+                            <form action="{{ route('user.habits.destroy', $habit) }}" method="post" class="ms-auto" onsubmit="return confirm('Delete this habit?');">
                                 @csrf
                                 @method('DELETE')
                                 <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>

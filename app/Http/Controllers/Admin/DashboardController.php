@@ -22,6 +22,8 @@ class DashboardController extends Controller
             'users' => User::query()->count(),
             'admins' => User::query()->where('role', 'admin')->count(),
             'habits' => Habit::query()->count(),
+            'habits_public' => Habit::query()->where('type', 'public')->whereNull('parent_id')->count(),
+            'habits_private' => Habit::query()->where('type', 'private')->count(),
             'completions_today' => HabitLog::query()->whereDate('completed_date', today())->where('is_completed', true)->count(),
             'badges_awarded' => UserBadge::query()->count(),
         ];

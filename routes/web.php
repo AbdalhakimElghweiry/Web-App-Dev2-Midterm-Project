@@ -24,6 +24,11 @@ Auth::routes();
 
 Route::middleware(['auth', 'user.role'])->prefix('app')->name('user.')->group(function (): void {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/explore', [UserHabitController::class, 'explore'])->name('habits.explore');
+    Route::post('/habits/{habit}/join', [UserHabitController::class, 'join'])->name('habits.join');
+    Route::get('/habits/{habit}/community', [UserHabitController::class, 'showCommunity'])->name('habits.community');
+    Route::post('/habits/{habit}/posts', [UserHabitController::class, 'storePost'])->name('habits.posts.store');
+    
     Route::resource('habits', UserHabitController::class)->except(['show']);
     Route::post('/habits/{habit}/log', [UserHabitController::class, 'saveLog'])->name('habits.log');
     Route::get('/badges', [UserBadgeController::class, 'index'])->name('badges.index');
@@ -32,7 +37,11 @@ Route::middleware(['auth', 'user.role'])->prefix('app')->name('user.')->group(fu
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', AdminUserController::class)->except(['show']);
+    
+    Route::get('/habits/{habit}/details', [AdminHabitController::class, 'showDetails'])->name('habits.details');
+    Route::post('/habits/{habit}/award-credits', [AdminHabitController::class, 'awardCredits'])->name('habits.award-credits');
     Route::resource('habits', AdminHabitController::class)->except(['show']);
+    
     Route::resource('badges', AdminBadgeController::class)->except(['show']);
 });
 
